@@ -1,0 +1,14 @@
+# SmartSafety PPE检测系统依赖包
+# 来源: https://blog.csdn.net/QQ_1309399183/article/details/147738037
+
+# Web框架
+Flask==2.3.3
+python-dotenv==1.0.0
+
+# 计算机视觉和深度学习
+opencv-python==4.8.1.78
+ultralytics==8.0.200
+numpy==1.24.3
+
+# 可选依赖（用于演示）
+Pillow==10.0.1
