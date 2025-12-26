@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSafety - PPE智能检测系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/daisyui/4.12.10/full.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- 导航栏 -->
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <label tabindex="0" class="btn btn-ghost lg:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </label>
+                <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="/"><i class="fas fa-home mr-2"></i>实时监控</a></li>
+                    <li><a href="/updates"><i class="fas fa-chart-line mr-2"></i>检测记录</a></li>
+                    <li><a href="/logs"><i class="fas fa-history mr-2"></i>历史日志</a></li>
+                </ul>
+            </div>
+            <a class="btn btn-ghost normal-case text-xl">
+                <i class="fas fa-shield-alt text-primary mr-2"></i>
+                SmartSafety
+            </a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="/" class="active"><i class="fas fa-home mr-2"></i>实时监控</a></li>
+                <li><a href="/updates"><i class="fas fa-chart-line mr-2"></i>检测记录</a></li>
+                <li><a href="/logs"><i class="fas fa-history mr-2"></i>历史日志</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <div class="badge badge-success gap-2">
+                <i class="fas fa-circle text-xs"></i>
+                系统运行中
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- 状态概览 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-primary">
+                    <i class="fas fa-video text-3xl"></i>
+                </div>
+                <div class="stat-title">摄像头状态</div>
+                <div class="stat-value text-primary">在线</div>
+                <div class="stat-desc">1920×1080 @ 45FPS</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-success">
+                    <i class="fas fa-bullseye text-3xl"></i>
+                </div>
+                <div class="stat-title">检测准确率</div>
+                <div class="stat-value text-success">92.3%</div>
+                <div class="stat-desc">mAP@0.5</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-warning">
+                    <i class="fas fa-exclamation-triangle text-3xl"></i>
+                </div>
+                <div class="stat-title">今日告警</div>
+                <div class="stat-value text-warning">12</div>
+                <div class="stat-desc">PPE缺失检测</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-info">
+                    <i class="fas fa-clock text-3xl"></i>
+                </div>
+                <div class="stat-title">运行时间</div>
+                <div class="stat-value text-info">24h</div>
+                <div class="stat-desc">连续运行</div>
+            </div>
+        </div>
+
+        <!-- 视频流和控制面板 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 实时视频流 -->
+            <div class="lg:col-span-2">
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title">
+                            <i class="fas fa-video text-primary"></i>
+                            实时监控画面
+                        </h2>
+                        <div class="video-container bg-gray-900 rounded-lg overflow-hidden">
+                            <img src="{{ url_for('video_feed') }}" alt="实时视频流" 
+                                 class="w-full h-auto" 
+                                 style="min-height: 480px; object-fit: cover;">
+                        </div>
+                        <div class="card-actions justify-end mt-4">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-camera mr-2"></i>
+                                手动截图
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download mr-2"></i>
+                                保存录像
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 控制面板和状态 -->
+            <div class="space-y-6">
+                <!-- 摄像头源选择 -->
+                <div class="card bg-base-100 shadow">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-camera text-primary"></i>
+                            摄像头设置
+                        </h3>
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">视频源选择</span>
+                            </label>
+                            <select class="select select-bordered w-full" id="cameraSource">
+                                <option value="0">物理摄像头 (设备0)</option>
+                                <option value="1">物理摄像头 (设备1)</option>
+                                <option value="test_video.mp4">测试视频文件</option>
+                                <option value="virtual">虚拟摄像头 (v4l2loopback)</option>
+                                <option value="demo">演示模式</option>
+                            </select>
+                        </div>
+                        <div class="form-control mt-4">
+                            <button class="btn btn-primary" onclick="changeCameraSource()">
+                                <i class="fas fa-sync mr-2"></i>
+                                切换视频源
+                            </button>
+                        </div>
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle"></i>
+                            <span>当前状态: <span id="cameraStatus">演示模式 - 无摄像头</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 检测控制 -->
+                <div class="card bg-base-100 shadow">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-cog text-primary"></i>
+                            检测控制
+                        </h3>
+                        <div class="form-control">
+                            <label class="label cursor-pointer">
+                                <span class="label-text">启用检测</span>
+                                <input type="checkbox" class="toggle toggle-primary" checked />
+                            </label>
+                        </div>
+                        <div class="form-control">
+                            <label class="label cursor-pointer">
+                                <span class="label-text">自动截图</span>
+                                <input type="checkbox" class="toggle toggle-secondary" checked />
+                            </label>
+                        </div>
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">置信度阈值</span>
+                            </label>
+                            <input type="range" min="0.1" max="1.0" value="0.6" step="0.1" 
+                                   class="range range-primary" />
+                            <div class="w-full flex justify-between text-xs px-2">
+                                <span>0.1</span>
+                                <span>0.6</span>
+                                <span>1.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PPE检测项目 -->
+                <div class="card bg-base-100 shadow">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-hard-hat text-primary"></i>
+                            PPE检测项目
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-hard-hat text-yellow-500 mr-2"></i>
+                                    <span>安全帽</span>
+                                </div>
+                                <div class="badge badge-success">正常</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-eye text-blue-500 mr-2"></i>
+                                    <span>防护眼镜</span>
+                                </div>
+                                <div class="badge badge-success">正常</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-vest text-orange-500 mr-2"></i>
+                                    <span>反光背心</span>
+                                </div>
+                                <div class="badge badge-warning">缺失</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-hand-paper text-green-500 mr-2"></i>
+                                    <span>防护手套</span>
+                                </div>
+                                <div class="badge badge-success">正常</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-head-side-mask text-purple-500 mr-2"></i>
+                                    <span>口罩</span>
+                                </div>
+                                <div class="badge badge-success">正常</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统信息 -->
+                <div class="card bg-base-100 shadow">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle text-info"></i>
+                            系统信息
+                        </h3>
+                        <div class="text-sm space-y-2">
+                            <div class="flex justify-between">
+                                <span>模型版本:</span>
+                                <span class="font-mono">YOLOv8s</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>输入分辨率:</span>
+                                <span class="font-mono">640×640</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>检测类别:</span>
+                                <span>5类PPE</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>最后更新:</span>
+                                <span id="last-update">--:--:--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近检测记录 -->
+        <div class="mt-8">
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        <i class="fas fa-history text-primary"></i>
+                        最近检测记录
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>检测项目</th>
+                                    <th>状态</th>
+                                    <th>截图</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>14:32:15</td>
+                                    <td>反光背心检测</td>
+                                    <td><div class="badge badge-warning">缺失</div></td>
+                                    <td><button class="btn btn-xs btn-info">查看</button></td>
+                                </tr>
+                                <tr>
+                                    <td>14:28:42</td>
+                                    <td>安全帽检测</td>
+                                    <td><div class="badge badge-success">正常</div></td>
+                                    <td><button class="btn btn-xs btn-info">查看</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for camera control -->
+    <script>
+        // 摄像头状态更新
+        function updateCameraStatus() {
+            fetch('/camera_status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cameraStatus').textContent = data.status;
+                })
+                .catch(error => {
+                    console.error('Error updating camera status:', error);
+                });
+        }
+
+        // 切换摄像头源
+        function changeCameraSource() {
+            const source = document.getElementById('cameraSource').value;
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            // 显示加载状态
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>切换中...';
+            button.disabled = true;
+            
+            fetch('/switch_camera', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ source: source })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 显示成功消息
+                    showNotification('摄像头源切换成功！', 'success');
+                    // 刷新视频流
+                    setTimeout(() => {
+                        const videoElement = document.querySelector('img[src*="video_feed"]');
+                        if (videoElement) {
+                            videoElement.src = videoElement.src.split('?')[0] + '?t=' + Date.now();
+                        }
+                    }, 1000);
+                } else {
+                    showNotification('切换失败: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error switching camera:', error);
+                showNotification('切换失败: 网络错误', 'error');
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                button.innerHTML = originalText;
+                button.disabled = false;
+                // 更新状态
+                updateCameraStatus();
+            });
+        }
+
+        // 显示通知
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} fixed top-4 right-4 z-50`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // 定期更新摄像头状态
+        setInterval(updateCameraStatus, 5000);
+        
+        // 页面加载时更新状态
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCameraStatus();
+        });
+    </script>
+
+</body>
+</html>

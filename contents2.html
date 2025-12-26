@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史日志 - SmartSafety PPE智能检测系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/daisyui/4.12.10/full.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- 导航栏 -->
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <label tabindex="0" class="btn btn-ghost lg:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </label>
+                <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="/"><i class="fas fa-home mr-2"></i>实时监控</a></li>
+                    <li><a href="/updates"><i class="fas fa-chart-line mr-2"></i>检测记录</a></li>
+                    <li><a href="/logs" class="active"><i class="fas fa-history mr-2"></i>历史日志</a></li>
+                </ul>
+            </div>
+            <a class="btn btn-ghost normal-case text-xl">
+                <i class="fas fa-shield-alt text-primary mr-2"></i>
+                SmartSafety
+            </a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="/"><i class="fas fa-home mr-2"></i>实时监控</a></li>
+                <li><a href="/updates"><i class="fas fa-chart-line mr-2"></i>检测记录</a></li>
+                <li><a href="/logs" class="active"><i class="fas fa-history mr-2"></i>历史日志</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <div class="join">
+                <input type="text" placeholder="搜索日志..." class="input input-bordered input-sm join-item" />
+                <button class="btn btn-primary btn-sm join-item">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- 日志统计 -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card bg-base-100 shadow">
+                <div class="card-body items-center text-center">
+                    <i class="fas fa-file-alt text-4xl text-primary mb-2"></i>
+                    <h2 class="card-title">总日志数</h2>
+                    <p class="text-3xl font-bold">{{ (data1|length + data2|length + data3|length + data4|length + data5|length + data6|length) }}</p>
+                </div>
+            </div>
+            
+            <div class="card bg-base-100 shadow">
+                <div class="card-body items-center text-center">
+                    <i class="fas fa-exclamation-circle text-4xl text-error mb-2"></i>
+                    <h2 class="card-title">告警日志</h2>
+                    <p class="text-3xl font-bold text-error">{{ (data1|length + data2|length + data3|length) }}</p>
+                </div>
+            </div>
+            
+            <div class="card bg-base-100 shadow">
+                <div class="card-body items-center text-center">
+                    <i class="fas fa-check-circle text-4xl text-success mb-2"></i>
+                    <h2 class="card-title">正常日志</h2>
+                    <p class="text-3xl font-bold text-success">{{ (data4|length + data5|length + data6|length) }}</p>
+                </div>
+            </div>
+            
+            <div class="card bg-base-100 shadow">
+                <div class="card-body items-center text-center">
+                    <i class="fas fa-calendar-day text-4xl text-info mb-2"></i>
+                    <h2 class="card-title">今日新增</h2>
+                    <p class="text-3xl font-bold text-info">12</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 筛选和导出 -->
+        <div class="card bg-base-100 shadow mb-6">
+            <div class="card-body">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">日期范围</span>
+                        </label>
+                        <input type="date" class="input input-bordered input-sm" value="2024-01-01" />
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">检测项目</span>
+                        </label>
+                        <select class="select select-bordered select-sm">
+                            <option value="">全部</option>
+                            <option value="apron">反光背心</option>
+                            <option value="bunny_suit">防护服</option>
+                            <option value="mask">口罩</option>
+                            <option value="gloves">手套</option>
+                            <option value="goggles">防护眼镜</option>
+                            <option value="headcap">头套</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">状态</span>
+                        </label>
+                        <select class="select select-bordered select-sm">
+                            <option value="">全部</option>
+                            <option value="missing">缺失</option>
+                            <option value="normal">正常</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">设备</span>
+                        </label>
+                        <select class="select select-bordered select-sm">
+                            <option value="">全部设备</option>
+                            <option value="camera1">摄像头1</option>
+                            <option value="camera2">摄像头2</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text"> </span>
+                        </label>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-filter mr-2"></i>
+                            筛选
+                        </button>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text"> </span>
+                        </label>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-download mr-2"></i>
+                            导出
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细日志表格 -->
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fas fa-list text-primary"></i>
+                    详细日志记录
+                </h2>
+                
+                <!-- 反光背心日志 -->
+                <div class="collapse collapse-arrow bg-base-200 mb-4">
+                    <input type="radio" name="log-accordion" checked="checked" /> 
+                    <div class="collapse-title text-xl font-medium text-error">
+                        <i class="fas fa-vest mr-2"></i>
+                        反光背心缺失记录 ({{ data1|length }}条)
+                    </div>
+                    <div class="collapse-content"> 
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>文件名</th>
+                                        <th>设备ID</th>
+                                        <th>检测时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in data1 %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="font-mono text-sm">{{ item[1] }}</td>
+                                        <td>{{ item[2] }}</td>
+                                        <td>{{ item[4] }}</td>
+                                        <td>
+                                            <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-error" onclick="deleteLog('{{ item[0] }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not data1 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-gray-500">暂无记录</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 防护服日志 -->
+                <div class="collapse collapse-arrow bg-base-200 mb-4">
+                    <input type="radio" name="log-accordion" /> 
+                    <div class="collapse-title text-xl font-medium text-warning">
+                        <i class="fas fa-tshirt mr-2"></i>
+                        防护服缺失记录 ({{ data2|length }}条)
+                    </div>
+                    <div class="collapse-content"> 
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>文件名</th>
+                                        <th>设备ID</th>
+                                        <th>检测时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in data2 %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="font-mono text-sm">{{ item[1] }}</td>
+                                        <td>{{ item[2] }}</td>
+                                        <td>{{ item[4] }}</td>
+                                        <td>
+                                            <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-error" onclick="deleteLog('{{ item[0] }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not data2 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-gray-500">暂无记录</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 口罩日志 -->
+                <div class="collapse collapse-arrow bg-base-200 mb-4">
+                    <input type="radio" name="log-accordion" /> 
+                    <div class="collapse-title text-xl font-medium text-info">
+                        <i class="fas fa-head-side-mask mr-2"></i>
+                        口罩缺失记录 ({{ data3|length }}条)
+                    </div>
+                    <div class="collapse-content"> 
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>文件名</th>
+                                        <th>设备ID</th>
+                                        <th>检测时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in data3 %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="font-mono text-sm">{{ item[1] }}</td>
+                                        <td>{{ item[2] }}</td>
+                                        <td>{{ item[4] }}</td>
+                                        <td>
+                                            <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-error" onclick="deleteLog('{{ item[0] }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not data3 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-gray-500">暂无记录</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 手套日志 -->
+                <div class="collapse collapse-arrow bg-base-200 mb-4">
+                    <input type="radio" name="log-accordion" /> 
+                    <div class="collapse-title text-xl font-medium text-success">
+                        <i class="fas fa-hand-paper mr-2"></i>
+                        手套缺失记录 ({{ data4|length }}条)
+                    </div>
+                    <div class="collapse-content"> 
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>文件名</th>
+                                        <th>设备ID</th>
+                                        <th>检测时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in data4 %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="font-mono text-sm">{{ item[1] }}</td>
+                                        <td>{{ item[2] }}</td>
+                                        <td>{{ item[4] }}</td>
+                                        <td>
+                                            <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-error" onclick="deleteLog('{{ item[0] }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not data4 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-gray-500">暂无记录</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 防护眼镜日志 -->
+                <div class="collapse collapse-arrow bg-base-200 mb-4">
+                    <input type="radio" name="log-accordion" /> 
+                    <div class="collapse-title text-xl font-medium text-primary">
+                        <i class="fas fa-eye mr-2"></i>
+                        防护眼镜缺失记录 ({{ data5|length }}条)
+                    </div>
+                    <div class="collapse-content"> 
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>文件名</th>
+                                        <th>设备ID</th>
+                                        <th>检测时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in data5 %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="font-mono text-sm">{{ item[1] }}</td>
+                                        <td>{{ item[2] }}</td>
+                                        <td>{{ item[4] }}</td>
+                                        <td>
+                                            <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-error" onclick="deleteLog('{{ item[0] }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not data5 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-gray-500">暂无记录</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 头套日志 -->
+                <div class="collapse collapse-arrow bg-base-200">
+                    <input type="radio" name="log-accordion" /> 
+                    <div class="collapse-title text-xl font-medium text-secondary">
+                        <i class="fas fa-hard-hat mr-2"></i>
+                        头套缺失记录 ({{ data6|length }}条)
+                    </div>
+                    <div class="collapse-content"> 
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>文件名</th>
+                                        <th>设备ID</th>
+                                        <th>检测时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in data6 %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="font-mono text-sm">{{ item[1] }}</td>
+                                        <td>{{ item[2] }}</td>
+                                        <td>{{ item[4] }}</td>
+                                        <td>
+                                            <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-error" onclick="deleteLog('{{ item[0] }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not data6 %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-gray-500">暂无记录</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片查看模态框 -->
+    <dialog id="imageModal" class="modal">
+        <form method="dialog" class="modal-box max-w-4xl">
+            <h3 class="font-bold text-lg">检测截图</h3>
+            <div class="py-4">
+                <img id="modalImage" src="" alt="检测截图" class="w-full h-auto">
+            </div>
+            <div class="modal-action">
+                <button class="btn">关闭</button>
+            </div>
+        </form>
+        <form method="dialog" class="modal-backdrop">
+            <button>关闭</button>
+        </form>
+    </dialog>
+
+    <!-- 页脚 -->
+    <footer class="footer footer-center p-4 bg-base-200 text-base-content mt-12">
+        <div>
+            <p>Copyright © 2024 SmartSafety PPE检测系统. All rights reserved.</p>
+            <p class="text-sm text-base-content/70">基于YOLOv8深度学习技术 | 来源: <a href="https://blog.csdn.net/QQ_1309399183/article/details/147738037" class="link link-primary" target="_blank">CSDN博客</a></p>
+        </div>
+    </footer>
+
+    <script>
+        function viewImage(filename) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = `/images/${filename}`;
+            modal.showModal();
+        }
+
+        function deleteLog(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                // 这里可以添加删除逻辑
+                alert('记录已删除');
+                location.reload();
+            }
+        }
+
+        // 自动刷新数据
+        setInterval(function() {
+            location.reload();
+        }, 60000);
+
+        // 添加表格行悬停效果
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.classList.add('bg-base-200');
+            });
+            row.addEventListener('mouseleave', function() {
+                this.classList.remove('bg-base-200');
+            });
+        });
+
+        // 筛选功能
+        document.querySelectorAll('select, input[type="date"]').forEach(element => {
+            element.addEventListener('change', function()

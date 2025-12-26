@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检测记录 - SmartSafety PPE智能检测系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/daisyui/4.12.10/full.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- 导航栏 -->
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <label tabindex="0" class="btn btn-ghost lg:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </label>
+                <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="/"><i class="fas fa-home mr-2"></i>实时监控</a></li>
+                    <li><a href="/updates" class="active"><i class="fas fa-chart-line mr-2"></i>检测记录</a></li>
+                    <li><a href="/logs"><i class="fas fa-history mr-2"></i>历史日志</a></li>
+                </ul>
+            </div>
+            <a class="btn btn-ghost normal-case text-xl">
+                <i class="fas fa-shield-alt text-primary mr-2"></i>
+                SmartSafety
+            </a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="/"><i class="fas fa-home mr-2"></i>实时监控</a></li>
+                <li><a href="/updates" class="active"><i class="fas fa-chart-line mr-2"></i>检测记录</a></li>
+                <li><a href="/logs"><i class="fas fa-history mr-2"></i>历史日志</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <button class="btn btn-primary btn-sm" onclick="refreshData()">
+                <i class="fas fa-sync-alt mr-2"></i>
+                刷新数据
+            </button>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- 统计概览 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-error">
+                    <i class="fas fa-vest text-3xl"></i>
+                </div>
+                <div class="stat-title">反光背心缺失</div>
+                <div class="stat-value text-error">{{ data1|length }}</div>
+                <div class="stat-desc">今日记录</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-warning">
+                    <i class="fas fa-tshirt text-3xl"></i>
+                </div>
+                <div class="stat-title">防护服缺失</div>
+                <div class="stat-value text-warning">{{ data2|length }}</div>
+                <div class="stat-desc">今日记录</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-info">
+                    <i class="fas fa-head-side-mask text-3xl"></i>
+                </div>
+                <div class="stat-title">口罩缺失</div>
+                <div class="stat-value text-info">{{ data3|length }}</div>
+                <div class="stat-desc">今日记录</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-box shadow">
+                <div class="stat-figure text-success">
+                    <i class="fas fa-hand-paper text-3xl"></i>
+                </div>
+                <div class="stat-title">手套缺失</div>
+                <div class="stat-value text-success">{{ data4|length }}</div>
+                <div class="stat-desc">今日记录</div>
+            </div>
+        </div>
+
+        <!-- 详细记录表格 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 反光背心缺失记录 -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div class="card-title text-error">
+                        <i class="fas fa-vest mr-2"></i>
+                        反光背心缺失记录
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra table-compact w-full">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>设备</th>
+                                    <th>截图</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data1 %}
+                                <tr>
+                                    <td>{{ item[4] }}</td>
+                                    <td>{{ item[2] }}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not data1 %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-500">暂无记录</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 防护服缺失记录 -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div class="card-title text-warning">
+                        <i class="fas fa-tshirt mr-2"></i>
+                        防护服缺失记录
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra table-compact w-full">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>设备</th>
+                                    <th>截图</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data2 %}
+                                <tr>
+                                    <td>{{ item[4] }}</td>
+                                    <td>{{ item[2] }}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not data2 %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-500">暂无记录</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 口罩缺失记录 -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div class="card-title text-info">
+                        <i class="fas fa-head-side-mask mr-2"></i>
+                        口罩缺失记录
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra table-compact w-full">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>设备</th>
+                                    <th>截图</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data3 %}
+                                <tr>
+                                    <td>{{ item[4] }}</td>
+                                    <td>{{ item[2] }}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not data3 %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-500">暂无记录</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 手套缺失记录 -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div class="card-title text-success">
+                        <i class="fas fa-hand-paper mr-2"></i>
+                        手套缺失记录
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra table-compact w-full">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>设备</th>
+                                    <th>截图</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data4 %}
+                                <tr>
+                                    <td>{{ item[4] }}</td>
+                                    <td>{{ item[2] }}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not data4 %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-500">暂无记录</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 防护眼镜和头套缺失记录 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <!-- 防护眼镜缺失记录 -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div class="card-title text-primary">
+                        <i class="fas fa-eye mr-2"></i>
+                        防护眼镜缺失记录
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra table-compact w-full">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>设备</th>
+                                    <th>截图</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data5 %}
+                                <tr>
+                                    <td>{{ item[4] }}</td>
+                                    <td>{{ item[2] }}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not data5 %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-500">暂无记录</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 头套缺失记录 -->
+            <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                    <div class="card-title text-secondary">
+                        <i class="fas fa-hard-hat mr-2"></i>
+                        头套缺失记录
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra table-compact w-full">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>设备</th>
+                                    <th>截图</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data6 %}
+                                <tr>
+                                    <td>{{ item[4] }}</td>
+                                    <td>{{ item[2] }}</td>
+                                    <td>
+                                        <button class="btn btn-xs btn-info" onclick="viewImage('{{ item[1] }}')">
+                                            <i class="fas fa-image"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not data6 %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-500">暂无记录</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片查看模态框 -->
+    <dialog id="imageModal" class="modal">
+        <form method="dialog" class="modal-box max-w-4xl">
+            <h3 class="font-bold text-lg">检测截图</h3>
+            <div class="py-4">
+                <img id="modalImage" src="" alt="检测截图" class="w-full h-auto">
+            </div>
+            <div class="modal-action">
+                <button class="btn">关闭</button>
+            </div>
+        </form>
+        <form method="dialog" class="modal-backdrop">
+            <button>关闭</button>
+        </form>
+    </dialog>
+
+    <!-- 页脚 -->
+    <footer class="footer footer-center p-4 bg-base-200 text-base-content mt-12">
+        <div>
+            <p>Copyright © 2024 SmartSafety PPE检测系统. All rights reserved.</p>
+            <p class="text-sm text-base-content/70">基于YOLOv8深度学习技术 | 来源: <a href="https://blog.csdn.net/QQ_1309399183/article/details/147738037" class="link link-primary" target="_blank">CSDN博客</a></p>
+        </div>
+    </footer>
+
+    <script>
+        function viewImage(filename) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = `/images/${filename}`;
+            modal.showModal();
+        }
+
+        function refreshData() {
+            location.reload();
+        }
+
+        // 自动刷新数据
+        setInterval(refreshData, 30000);
+
+        // 添加表格行悬停效果
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.classList.add('bg-base-200');
+            });
+            row.addEventListener('mouseleave', function() {
+                this.classList.remove('bg-base-200');
+            });
+        });
+    </script>
+</body>
+</html>
